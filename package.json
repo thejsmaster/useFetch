@@ -1,0 +1,33 @@
+{
+  "name": "use-fetch-react-xhr",
+  "version": "2.0.0",
+  "description": "A custom hook that's alternative to axios to simplify making api calls for React Application and  it  also lets you cancel request while it's in progress ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thejsmaster/useFetch.git"
+  },
+  "keywords": [
+    "usefetch",
+    "reactjs",
+    "api-integration",
+    "axios-alternative"
+  ],
+  "author": "Sean Freeman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thejsmaster/useFetch/issues"
+  },
+  "homepage": "https://github.com/thejsmaster/useFetch#readme",
+  "dependencies": {
+    "@types/react": "^18.0.28",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}
