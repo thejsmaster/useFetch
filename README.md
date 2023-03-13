@@ -11,6 +11,9 @@ To install use-fetch-react-xhr, run:
 ```sh
 npm install use-fetch-react-xhr
 ```
+## Example (counter)
+
+https://stackblitz.com/edit/react-ts-rcxsti?file=App.tsx
 
 ### Usage
 
