@@ -14,6 +14,18 @@ export type ApiCallResult = {
     isSuccess: boolean;
     isError: boolean;
     isCancelled: boolean;
+    request: XMLHttpRequest | null;
+};
+export type UseFetchResponse = {
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+    data: any;
+    error: APIError;
+    isCancelled: boolean;
+    load: () => void;
+    cancel: () => void;
+    request: XMLHttpRequest | null;
 };
 type StartFunction = (url: string, type?: string, payload?: any, headers?: Record<string, string>) => void;
 export declare const createApiCallFunction: () => {
@@ -22,14 +34,11 @@ export declare const createApiCallFunction: () => {
     cancel: () => void;
     removeListener: () => void;
 };
-export declare const useFetch: ({ url, payload, headers, type, autoLoad, callOnMount, }: ApiParams) => {
-    isLoading: boolean;
-    isSuccess: boolean;
-    isError: boolean;
-    data: any;
-    error: string;
-    isCancelled: boolean;
-    load: () => void;
-    cancel: () => void;
+export type APIError = {
+    status: number;
+    statusText: string;
+    message: any;
+    responseData: any;
 };
+export declare const useFetch: ({ url, payload, headers, type, autoLoad, callOnMount, }: ApiParams) => UseFetchResponse;
 export {};

@@ -17,6 +17,19 @@ export type ApiCallResult = {
   isSuccess: boolean;
   isError: boolean;
   isCancelled: boolean;
+  request: XMLHttpRequest | null;
+};
+
+export type UseFetchResponse = {
+  isLoading: boolean;
+  isSuccess: boolean;
+  isError: boolean;
+  data: any;
+  error: APIError;
+  isCancelled: boolean;
+  load: () => void;
+  cancel: () => void;
+  request: XMLHttpRequest | null;
 };
 
 type ApiCallOptions = {
@@ -94,24 +107,56 @@ export const createApiCallFunction = () => {
       }
 
       if (request.readyState === 4) {
-        if (request.status >= 200 && request.status < 300) {
-          const response = JSON.parse(request.responseText);
-          notifyListener({
-            status: "success",
-            data: response,
-            isLoading: false,
-            isSuccess: true,
-            isError: false,
-            isCancelled: false,
-          });
-        } else {
-          const error = {
-            status: request.status,
-            message: request.statusText,
-          };
+        try {
+          if (request.status >= 200 && request.status < 300) {
+            const response = JSON.parse(request.responseText);
+            // throw Error('new error');
+            notifyListener({
+              status: "success",
+              data: response,
+              isLoading: false,
+              isSuccess: true,
+              isError: false,
+              request,
+              error: null,
+              isCancelled: false,
+            });
+          } else {
+            let data = "";
+            if (
+              request
+                .getResponseHeader("Content-Type")
+                .includes("application/json")
+            ) {
+              data = JSON.parse(request.responseText);
+            }
+            const error = {
+              status: request.status,
+              statusText: request.statusText,
+              data: data,
+              message: "Error Loading Data!",
+            };
+
+            notifyListener({
+              status: "error",
+              error,
+              request,
+              isLoading: false,
+              isSuccess: false,
+              isError: true,
+              isCancelled: false,
+            });
+          }
+        } catch (error) {
           notifyListener({
             status: "error",
-            error,
+            error: {
+              status: request.status,
+              statusText: request.statusText,
+              data: { error: { message: "error while parsing response body" } },
+              message: "error while parsing response body",
+            },
+            request,
             isLoading: false,
             isSuccess: false,
             isError: true,
@@ -129,6 +174,7 @@ export const createApiCallFunction = () => {
       isSuccess: false,
       isError: false,
       isCancelled: false,
+      request,
     });
     // }, MIN_REQUEST_DELAY);
   };
@@ -143,6 +189,7 @@ export const createApiCallFunction = () => {
         isSuccess: false,
         isError: false,
         isCancelled: true,
+        request,
       });
     }
   };
@@ -167,6 +214,13 @@ function isEqual(a: any, b: any) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+export type APIError = {
+  status: number;
+  statusText: string;
+  message: any;
+  responseData: any;
+};
+
 export const useFetch = ({
   url,
   payload,
@@ -174,16 +228,7 @@ export const useFetch = ({
   type,
   autoLoad = false,
   callOnMount = false,
-}: ApiParams): {
-  isLoading: boolean;
-  isSuccess: boolean;
-  isError: boolean;
-  data: any;
-  error: string;
-  isCancelled: boolean;
-  load: () => void;
-  cancel: () => void;
-} => {
+}: ApiParams): UseFetchResponse => {
   const [result, setResult] = useState<ApiCallResult>({
     status: "idle",
     data: null,
@@ -192,6 +237,7 @@ export const useFetch = ({
     isSuccess: false,
     isError: false,
     isCancelled: false,
+    request: null,
   });
   const [apiCall, setAPICall] = useState<any>(null);
   const [makeInitialCall, setMakeInitialCall] = useState(callOnMount);
@@ -244,5 +290,6 @@ export const useFetch = ({
     isCancelled: result.isCancelled || false,
     load,
     cancel,
+    request: result.request,
   };
 };

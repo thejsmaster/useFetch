@@ -1,6 +1,6 @@
 {
   "name": "use-fetch-react-xhr",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A custom hook that's alternative to axios to simplify making api calls for React Application and  it  also lets you cancel request while it's in progress ",
   "main": "index.js",
   "scripts": {

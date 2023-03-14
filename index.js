@@ -47,25 +47,55 @@ export var createApiCallFunction = function () {
                 return;
             }
             if (request.readyState === 4) {
-                if (request.status >= 200 && request.status < 300) {
-                    var response = JSON.parse(request.responseText);
-                    notifyListener({
-                        status: "success",
-                        data: response,
-                        isLoading: false,
-                        isSuccess: true,
-                        isError: false,
-                        isCancelled: false,
-                    });
+                try {
+                    if (request.status >= 200 && request.status < 300) {
+                        var response = JSON.parse(request.responseText);
+                        // throw Error('new error');
+                        notifyListener({
+                            status: "success",
+                            data: response,
+                            isLoading: false,
+                            isSuccess: true,
+                            isError: false,
+                            request: request,
+                            error: null,
+                            isCancelled: false,
+                        });
+                    }
+                    else {
+                        var data = "";
+                        if (request
+                            .getResponseHeader("Content-Type")
+                            .includes("application/json")) {
+                            data = JSON.parse(request.responseText);
+                        }
+                        var error = {
+                            status: request.status,
+                            statusText: request.statusText,
+                            data: data,
+                            message: "Error Loading Data!",
+                        };
+                        notifyListener({
+                            status: "error",
+                            error: error,
+                            request: request,
+                            isLoading: false,
+                            isSuccess: false,
+                            isError: true,
+                            isCancelled: false,
+                        });
+                    }
                 }
-                else {
-                    var error = {
-                        status: request.status,
-                        message: request.statusText,
-                    };
+                catch (error) {
                     notifyListener({
                         status: "error",
-                        error: error,
+                        error: {
+                            status: request.status,
+                            statusText: request.statusText,
+                            data: { error: { message: "error while parsing response body" } },
+                            message: "error while parsing response body",
+                        },
+                        request: request,
                         isLoading: false,
                         isSuccess: false,
                         isError: true,
@@ -82,6 +112,7 @@ export var createApiCallFunction = function () {
             isSuccess: false,
             isError: false,
             isCancelled: false,
+            request: request,
         });
         // }, MIN_REQUEST_DELAY);
     };
@@ -95,6 +126,7 @@ export var createApiCallFunction = function () {
                 isSuccess: false,
                 isError: false,
                 isCancelled: true,
+                request: request,
             });
         }
     };
@@ -124,6 +156,7 @@ export var useFetch = function (_a) {
         isSuccess: false,
         isError: false,
         isCancelled: false,
+        request: null,
     }), result = _d[0], setResult = _d[1];
     var _e = useState(null), apiCall = _e[0], setAPICall = _e[1];
     var _f = useState(callOnMount), makeInitialCall = _f[0], setMakeInitialCall = _f[1];
@@ -173,5 +206,6 @@ export var useFetch = function (_a) {
         isCancelled: result.isCancelled || false,
         load: load,
         cancel: cancel,
+        request: result.request,
     };
 };
