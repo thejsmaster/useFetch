@@ -153,8 +153,8 @@ export const createApiCallFunction = () => {
             error: {
               status: request.status,
               statusText: request.statusText,
-              data: { error: { message: "error while parsing response body" } },
-              message: "error while parsing response body",
+              data: {},
+              message: "error while parsing response from server" + error,
             },
             request,
             isLoading: false,
@@ -218,7 +218,7 @@ export type APIError = {
   status: number;
   statusText: string;
   message: any;
-  responseData: any;
+  data: any;
 };
 
 export const useFetch = ({
